@@ -4,12 +4,12 @@
 
 This project uses 4 datasets from Kaggle, each having a variety of data that differs from the others: 
 
-| Dataset | Source | Size |
-|---|---|---|
-| `Spotify_data.xlsx` | [Kaggle: Spotify User Behavior Dataset](https://www.kaggle.com/datasets/meeraajayakumar/spotify-user-behavior-dataset) | 520 rows |
-| `spotify_history.csv` | [Kaggle: Spotify Streaming History](https://www.kaggle.com/datasets/sgoutami/spotify-streaming-history) | ~150,000 rows |
-| `My_Streaming_Activity.csv` | [Kaggle: Streaming Activity Dataset](https://www.kaggle.com/datasets/thedevastator/streaming-activity-dataset) | ~2,500 rows |
-| `spotify_recommendations.csv` | [Kaggle: Spotify Recommendations Dataset](https://www.kaggle.com/datasets/bricevergnou/spotify-recommendation) | 195 songs |
+| Dataset | Source |
+|---|---|
+| `Spotify_data.xlsx` | [Kaggle: Spotify User Behavior Dataset](https://www.kaggle.com/datasets/meeraajayakumar/spotify-user-behavior-dataset) |
+| `spotify_history.csv` | [Kaggle: Spotify Streaming History](https://www.kaggle.com/datasets/sgoutami/spotify-streaming-history) |
+| `My_Streaming_Activity.csv` | [Kaggle: Streaming Activity Dataset](https://www.kaggle.com/datasets/thedevastator/streaming-activity-dataset) | 
+| `spotify_recommendations.csv` | [Kaggle: Spotify Recommendations Dataset](https://www.kaggle.com/datasets/bricevergnou/spotify-recommendation) | 
 
 ---
 
@@ -39,7 +39,7 @@ A dataset of 195 songs with Spotify audio features (danceability, energy, tempo,
 
 ## Data Collection Method
 
-All datasets were retrieved programmatically using `gdown` to pull files from a shared Google Drive folder into the Colab runtime. This is implemented in **Section 2** of [`data_cleaning.ipynb`](data_cleaning.ipynb):
+All Kaggle datasets were retrieved programmatically using `gdown` to pull files from a shared Google Drive folder into the Colab runtime.
 
 ```python
 !pip install gdown -q
@@ -63,3 +63,30 @@ gdown.download('https://drive.google.com/uc?id=1LgtifR5DqKPe0PTMbvUlJFU74Rv_uPx2
 ```
 
 After download, each file is loaded into a dedicated pandas DataFrame and immediately inspected for shape, column names, duplicate rows, and null counts before any cleaning is applied.
+
+## Data Cleaning
+ 
+In order to see the state of our data, we needed to perform an initial inspection. Below is a summary of what the data looked like initially for each of the 4 respective datasets:
+
+```
+Behavior
+Columns:  ['Age', 'Gender', 'spotify_usage_period', 'spotify_listening_device', 'spotify_subscription_plan', 'premium_sub_willingness', 'preffered_premium_plan', 'preferred_listening_content', 'fav_music_genre', 'music_time_slot', 'music_Influencial_mood', 'music_lis_frequency', 'music_expl_method', 'music_recc_rating', 'pod_lis_frequency', 'fav_pod_genre', 'preffered_pod_format', 'pod_host_preference', 'preffered_pod_duration', 'pod_variety_satisfaction']
+Duplicates:  1
+Nulls:  {'preffered_premium_plan': 208, 'fav_pod_genre': 148, 'preffered_pod_format': 140, 'pod_host_preference': 141, 'preffered_pod_duration': 129}
+
+History
+Columns:  ['spotify_track_uri', 'ts', 'platform', 'ms_played', 'track_name', 'artist_name', 'album_name', 'reason_start', 'reason_end', 'shuffle', 'skipped']
+Duplicates:  1185
+Nulls:  {'reason_start': 143, 'reason_end': 117}
+
+My Stream
+Columns:  ['index', 'SongID', 'TimeStamp_Central', 'Performer', 'Album', 'Song', 'TimeStamp_UTC']
+Duplicates:  0
+Nulls:  {'Album': 2559}
+
+Recommendations
+Columns:  ['danceability', 'energy', 'key', 'loudness', 'mode', 'speechiness', 'acousticness', 'instrumentalness', 'liveness', 'valence', 'tempo', 'duration_ms', 'time_signature', 'liked']
+Duplicates:  0
+Nulls:  None
+```
+---
