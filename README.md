@@ -2,7 +2,7 @@
 
 ## Data Sources
 
-This project uses four datasets, each serving a distinct role across the three models.
+This project uses 4 datasets from Kaggle, each having a variety of data that differs from the others: 
 
 | Dataset | Source | Size | Purpose |
 |---|---|---|---|
