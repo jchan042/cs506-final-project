@@ -217,7 +217,9 @@ This model implements a user-user collaborative filtering system built on top of
 1. Skip-Adjusted Interaction Weights
 Each (user, track) pair is assigned a weight based on listening behavior:
 
+```python
 weight = (complete_plays × 2 + non_skip_plays × 1 − skip_plays × 1.5) / total_plays
+```
 
 Completed listens are rewarded, skips are penalized, and tracks with only one play are zeroed out. Tracks scoring above 0.5 are labeled as “liked”.
 
