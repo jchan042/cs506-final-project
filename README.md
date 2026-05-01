@@ -210,6 +210,30 @@ No new features were derived here. Instead, all 13 existing Spotify audio featur
 
 #  Models
 
+## K-Nearest Neighbors (KNN)
+
+### Training Procedure
+
+The KNN model is trained on `spotify_recommendations.csv`, a dataset of 195 songs with Spotify audio features and a binary `liked` label (1 = liked, 0 = not liked). Nine continuous audio features were selected as inputs — danceability, energy, loudness, speechiness, acousticness, instrumentalness, liveness, valence, and tempo — while non-informative features like key, mode, and time_signature were excluded to keep the feature space clean.
+
+The data was split 70/15/15 into train, validation, and test sets using stratified sampling to achieve the class balance of 100 liked, 95 not liked. All features were standardized using `StandardScaler` before training since KNN is a distance-based model and unscaled features like tempo (0–250 BPM) would dominate other features that sit in the 0–1 range. K was tuned by evaluating F1 score on the validation set ranging from k=1 through 30, with **k=21** selected as optimal (validation F1 = 0.933).
+
+### Model Choice
+
+KNN is a very reasonable model for our project as song preference heavily relies on audio similarity. For example, if a user likes tracks with high danceability and low instrumentalness, the model finds new songs closest to those statistics in feature space. All nine input features are continuous and numeric, which is ideal for distance-based methods. The model also takes a liked song's audio features and fetches the most similar sounding songs by nearest-neighbor distance.
+
+### Evaluation Strategy
+
+The final model is evaluated on the test set of thirty songs using precision, recall, and F1 score rather than accuracy, since the slight class imbalance makes F1 a more reliable measure of performance. A confusion matrix is generated to visualize the breakdown of true/false positives and negatives regarding if the song was truly liked or not. Since KNN has no built-in feature weights, each feature is shuffled one at a time and the resulting drop in F1 score indicates how much the model relies on it.
+
+### Limitations & Failure Cases
+
+- **Small dataset:** Since we worked with only 195 songs and had thirty songs in the test set, our results may not have generalized reliably to broader listening behaviors.
+- **No personalization depth:** The model learns a single user's taste. It fails to distinguish that the user might like a combination of music genres for a variety of different reasons.
+- **Cold start:** The recommendation function requires a liked song as an input — it fails to generate song suggestions with no history.
+- **Euclidean distance assumptions:** After scaling, all nine features are treated as equally important. The model fails to understand that a user may prioritize tempo over danceability, for example.
+
+
 ### Cosine Similarity 
 
 This model implements a user-user collaborative filtering system built on top of Spotify listening history. It scores based on whether the user actually listened to it or skipped it, giving a clearer picture of what they genuinely like than raw play counts alone. Then, it uses cosine similarity to identify users with similar taste profiles and surface songs they loved that the target user hasn't heard yet.
