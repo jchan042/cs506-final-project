@@ -258,6 +258,21 @@ The model computes pairwise cosine similarity across all user vectors. Users wit
 4. Recommendation
 For a target user, the top ten most similar users are identified. Tracks they liked that the target hasn't heard are aggregated and ranked based on similarity-weighted score.
 
+#### Evaluation Strategy
+The model is evaluated using a holdout strategy where 20% of each user's liked tracks are hidden before recommendations are generated, then checked against the top 10 results. Precision, Recall, and F1 are reported rather than accuracy, since the goal is ranking and retrieval rather than binary classification. Users with fewer than 5 liked tracks are excluded, as there are not enough songs to construct a meaningful holdout set.
+
+| Metric | Description |
+|---|---|
+| Precision | How many of the recommended songs were actually in the hidden set |
+| Recall | How many of the hidden songs appeared in the recommendations |
+| F1 | The average of precision and recall combined into one score |
+
+#### Limitations & Failure Cases
+- **Cold start** — users with very few plays lack enough signal to build a meaningful preference vector or holdout set
+- **Synthetic users** — the 25 users are partitioned from a single person's history, which inflates similarity scores and reduces the diversity of taste the model is exposed to
+- **Sparsity** — most users have only heard a small fraction of all the songs in the dataset, making the user-item matrix sparse and candidate scores noisy
+- **Popularity bias** — tracks that appear across many users' histories naturally accumulate higher recommendation scores, regardless of how well they fit the target user specifically
+
 #  Visualizations 
 
 1. Genre Distribution (Bar Chart)
