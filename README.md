@@ -272,10 +272,10 @@ The model is evaluated using a holdout strategy where 20% of each user's liked t
 | F1 | The average of precision and recall combined into one score |
 
 ### Limitations & Failure Cases
-- **Cold start** — users with very few plays lack enough signal to build a meaningful preference vector or holdout set
-- **Synthetic users** — the 25 users are partitioned from a single person's history, which inflates similarity scores and reduces the diversity of taste the model is exposed to
-- **Sparsity** — most users have only heard a small fraction of all the songs in the dataset, making the user-item matrix sparse and candidate scores noisy
-- **Popularity bias** — tracks that appear across many users' histories naturally accumulate higher recommendation scores, regardless of how well they fit the target user specifically
+- **Cold start:** users with very few plays lack enough signal to build a meaningful preference vector or holdout set
+- **Synthetic users:** the 25 users are partitioned from a single person's history, which inflates similarity scores and reduces the diversity of taste the model is exposed to
+- **Sparsity:** most users have only heard a small fraction of all the songs in the dataset, making the user-item matrix sparse and candidate scores noisy
+- **Popularity bias:** tracks that appear across many users' histories naturally accumulate higher recommendation scores, regardless of how well they fit the target user specifically
 
 #  Visualizations 
 
