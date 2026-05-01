@@ -214,7 +214,7 @@ No new features were derived here. Instead, all 13 existing Spotify audio featur
 
 ### Training Procedure
 
-The KNN model is trained on `spotify_recommendations.csv`, a dataset of 195 songs with Spotify audio features and a binary `liked` label (1 = liked, 0 = not liked). Nine continuous audio features were selected as inputs — danceability, energy, loudness, speechiness, acousticness, instrumentalness, liveness, valence, and tempo — while non-informative features like key, mode, and time_signature were excluded to keep the feature space clean.
+The KNN model is trained on `spotify_recommendations.csv`, a dataset of 195 songs with Spotify audio features and a binary `liked` label (1 = liked, 0 = not liked). Nine continuous audio features were selected as inputs (danceability, energy, loudness, speechiness, acousticness, instrumentalness, liveness, valence, and tempo) while non-informative features like key, mode, and time_signature were excluded to keep the feature space clean.
 
 The data was split 70/15/15 into train, validation, and test sets using stratified sampling to achieve the class balance of 100 liked, 95 not liked. All features were standardized using `StandardScaler` before training since KNN is a distance-based model and unscaled features like tempo (0–250 BPM) would dominate other features that sit in the 0–1 range. K was tuned by evaluating F1 score on the validation set ranging from k=1 through 30, with **k=21** selected as optimal (validation F1 = 0.933).
 
@@ -230,7 +230,7 @@ The final model is evaluated on the test set of thirty songs using precision, re
 
 - **Small dataset:** Since we worked with only 195 songs and had thirty songs in the test set, our results may not have generalized reliably to broader listening behaviors.
 - **No personalization depth:** The model learns a single user's taste. It fails to distinguish that the user might like a combination of music genres for a variety of different reasons.
-- **Cold start:** The recommendation function requires a liked song as an input — it fails to generate song suggestions with no history.
+- **Cold start:** The recommendation function requires a liked song as an input. It fails to generate song suggestions without a given history.
 - **Euclidean distance assumptions:** After scaling, all nine features are treated as equally important. The model fails to understand that a user may prioritize tempo over danceability, for example.
 
 
