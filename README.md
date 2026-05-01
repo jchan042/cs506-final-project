@@ -208,6 +208,8 @@ No new features were derived here. Instead, all 13 existing Spotify audio featur
 | `time_signature` | Estimated beats per bar |
 | `liked` | **Target variable**: 1 if the user liked the track, 0 if not |
 
+#  Models
+
 #  Visualizations 
 
 1. Genre Distribution (Bar Chart)
