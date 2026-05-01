@@ -6,10 +6,10 @@ This project uses 4 datasets from Kaggle, each having a variety of data that dif
 
 | Dataset | Source | Size | Purpose |
 |---|---|---|---|
-| `Spotify_data.xlsx` | [Kaggle – Spotify User Behavior Dataset](https://www.kaggle.com/datasets/meeraajayakumar/spotify-user-behavior-dataset) | 520 rows | Survey data covering genre preferences, listening habits, and mood associations |
-| `spotify_history.csv` | [Kaggle – Spotify Streaming History](https://www.kaggle.com/datasets/sgoutami/spotify-streaming-history) | ~150,000 rows | User 1 play-by-play streaming history with timestamps, skip signals, and shuffle info |
-| `My_Streaming_Activity.csv` | Personal Spotify data export (User 2, 2017–2021) | ~2,500 rows | Second user's real streaming history; used for user-user collaborative filtering (Model 3) |
-| `spotify_recommendations.csv` | Personal labeled audio features | 195 songs | Binary liked/not-liked labels paired with Spotify audio features; primary training data for KNN (Model 1) |
+| `Spotify_data.xlsx` | [Kaggle: Spotify User Behavior Dataset](https://www.kaggle.com/datasets/meeraajayakumar/spotify-user-behavior-dataset) | 520 rows |
+| `spotify_history.csv` | [Kaggle: Spotify Streaming History](https://www.kaggle.com/datasets/sgoutami/spotify-streaming-history) | ~150,000 rows |
+| `My_Streaming_Activity.csv` | [Kaggle: Streaming Activity Dataset](https://www.kaggle.com/datasets/thedevastator/streaming-activity-dataset) | ~2,500 rows |
+| `spotify_recommendations.csv` | [Kaggle: Spotify Recommendations Dataset](https://www.kaggle.com/datasets/bricevergnou/spotify-recommendation) | 195 songs |
 
 The two Kaggle datasets were selected because their schema mirrors Spotify's native JSON streaming export format, ensuring the pipeline can generalize to real participant data. The personal Spotify export (`My_Streaming_Activity.csv`) provides a second authentic listening profile without requiring additional survey recruitment, enabling cross-user similarity modeling.
 
