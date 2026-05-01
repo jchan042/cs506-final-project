@@ -258,7 +258,11 @@ The model computes pairwise cosine similarity across all user vectors. Users wit
 4. Recommendation
 For a target user, the top ten most similar users are identified. Tracks they liked that the target hasn't heard are aggregated and ranked based on similarity-weighted score.
 
-#### Evaluation Strategy
+### Model Choice 
+
+User-user collaborative filtering is a fit for this project because music taste is inherently social; people with similar listening patterns tend to enjoy similar songs. Cosine similarity is well suited here as it compares the shape of two users' preference vectors rather than their size, meaning a user with 50 plays and one with 500 can still be meaningfully compared. The skip-adjusted weights ensure the data fed into the model reflects what users actually like, not just what they have played.
+
+### Evaluation Strategy
 The model is evaluated using a holdout strategy where 20% of each user's liked tracks are hidden before recommendations are generated, then checked against the top 10 results. Precision, Recall, and F1 are reported rather than accuracy, since the goal is ranking and retrieval rather than binary classification. Users with fewer than 5 liked tracks are excluded, as there are not enough songs to construct a meaningful holdout set.
 
 | Metric | Description |
@@ -267,7 +271,7 @@ The model is evaluated using a holdout strategy where 20% of each user's liked t
 | Recall | How many of the hidden songs appeared in the recommendations |
 | F1 | The average of precision and recall combined into one score |
 
-#### Limitations & Failure Cases
+### Limitations & Failure Cases
 - **Cold start** — users with very few plays lack enough signal to build a meaningful preference vector or holdout set
 - **Synthetic users** — the 25 users are partitioned from a single person's history, which inflates similarity scores and reduces the diversity of taste the model is exposed to
 - **Sparsity** — most users have only heard a small fraction of all the songs in the dataset, making the user-item matrix sparse and candidate scores noisy
