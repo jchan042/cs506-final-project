@@ -119,12 +119,99 @@ This dataset required minimal cleaning as it contained no nulls or duplicates. W
  
 ---
 
-
+## Feature Engineering
+ 
+Features were derived from the cleaned datasets to provide richer signals for modeling. The table below summarizes every engineered feature, the dataset it came from, and its purpose.
+ 
+| Feature | Dataset | Type | Purpose |
+|---|---|---|---|
+| `hour` | Streaming History (both users) | Temporal | Captures time-of-day listening patterns |
+| `day_of_week` | Streaming History (both users) | Temporal | Captures weekday vs. weekend behavior |
+| `month` | Streaming History (both users) | Temporal | Captures seasonal listening trends |
+| `year` | Streaming History (both users) | Temporal | Enables longitudinal comparison across years |
+| `seconds_played` | User 1 Streaming History | Behavioral | Human-readable form of `ms_played`; used for skip detection |
+| `minutes_played` | User 1 Streaming History | Behavioral | Higher-level duration for summary statistics |
+| `likely_skipped` | User 1 Streaming History | Behavioral | `True` if play was under 30s; flags implicit skips not captured by the `skipped` field |
+| `skip_rate` | User 1 Streaming History | Behavioral | Per-track mean of `likely_skipped`; measures how often a track gets skipped across all plays |
+| `play_count` | Streaming History (both users) | Behavioral | Number of times a track was played; proxy for preference strength |
+| `is_non_music` | User 2 Streaming Activity | Boolean flag | Marks rows where `Album` is null (podcasts, videos, gaming clips) so models can filter them |
+| `duration_s` | Audio Features | Audio | `duration_ms` converted to seconds for consistency |
+| `user_id` | Combined Streaming Dataset | Identifier | Labels each play as `'user_1'` or `'user_2'` to preserve user identity after merging |
+ 
+---
+ 
+### Spotify Streaming History 
+ 
+We extracted hour, day of week, month, and year from the timestamp for use in visualizations and as contextual features in modeling. Finally we derived two new columns, skip rate and play count per track, which serve as behavioral features.
+ 
+`skip_rate` is computed as the per-track mean of `likely_skipped` and reflects how frequently a track gets abandoned. `play_count` counts total plays per track and acts as a proxy for preference strength. Both are merged back onto the main DataFrame so every row carries track-level behavioral context.
+ 
+```python
+# Time features
+df_hist['hour']        = df_hist['ts'].dt.hour
+df_hist['day_of_week'] = df_hist['ts'].dt.day_name()
+df_hist['month']       = df_hist['ts'].dt.month
+df_hist['year']        = df_hist['ts'].dt.year
+ 
+# Behavioral features
+df_hist['likely_skipped'] = df_hist['seconds_played'] < 30
+ 
+skip_rate  = df_hist.groupby('track_name')['likely_skipped'].mean().reset_index()
+skip_rate.columns = ['track_name', 'skip_rate']
+ 
+play_count = df_hist.groupby('track_name').size().reset_index(name='play_count')
+ 
+df_hist = df_hist.merge(skip_rate,  on='track_name', how='left')
+df_hist = df_hist.merge(play_count, on='track_name', how='left')
+```
+ 
+---
+ 
+### Streaming Activity
+ 
+We also derived play count per track and extracted the same time features as the first streaming dataset.
+ 
+Because this dataset does not include milliseconds played or a skip field, `skip_rate` and `likely_skipped` cannot be computed and are not present. The shared features (`hour`, `day_of_week`, `month`, `year`, `play_count`) are what allow both users' histories to be combined into a single DataFrame for Model 3.
+ 
+```python
+# Time features
+df_myst['hour']        = df_myst['ts'].dt.hour
+df_myst['day_of_week'] = df_myst['ts'].dt.day_name()
+df_myst['month']       = df_myst['ts'].dt.month
+df_myst['year']        = df_myst['ts'].dt.year
+ 
+# Behavioral features
+play_count2 = df_myst.groupby('Song').size().reset_index(name='play_count')
+df_myst = df_myst.merge(play_count2, on='Song', how='left')
+```
+ 
+---
+ 
+### Audio Features + Liked Label Dataset
+ 
+No new features were derived here. Instead, all 13 existing Spotify audio features were normalized to `[0, 1]` using `MinMaxScaler` so they are on a comparable scale for KNN distance calculations. The features and what they measure are:
+ 
+| Feature | What it measures |
+|---|---|
+| `danceability` | How suitable a track is for dancing (rhythm, tempo stability, beat strength) |
+| `energy` | Perceptual intensity and activity level |
+| `key` | Estimated musical key (0 = C, 1 = C♯, … 11 = B) |
+| `loudness` | Overall loudness in decibels |
+| `mode` | Modality: major (1) or minor (0) |
+| `speechiness` | Presence of spoken words |
+| `acousticness` | Confidence that the track is acoustic |
+| `instrumentalness` | Likelihood of no vocal content |
+| `liveness` | Probability the track was recorded live |
+| `valence` | Musical positivity (high = happy, low = sad/tense) |
+| `tempo` | Estimated beats per minute |
+| `duration_s` | Track length in seconds |
+| `time_signature` | Estimated beats per bar |
+| `liked` | **Target variable**: 1 if the user liked the track, 0 if not |
 
 ##  Visualizations 
 
 1. Genre Distribution (Bar Chart)
-A count plot of fav_music_genre ranked by frequency reveals which genres dominate listener preferences across the survey population. This distribution is used to weight genre recommendations — genres with higher representation are surfaced more confidently, while niche genres signal an opportunity for deeper catalog exploration.
+A count plot of fav_music_genre ranked by frequency reveals which genres dominate listener preferences across the survey population. This distribution is used to weight genre recommendations; genres with higher representation are surfaced more confidently, while niche genres signal an opportunity for deeper catalog exploration.
 Key insight: Listener preferences are rarely uniform. A long tail of minority genres typically appears, suggesting that a one-size-fits-all genre filter would exclude a meaningful portion of users.
 
 2. Stream Frequency Heatmap by Calendar Date
@@ -138,12 +225,12 @@ Key insight: Listeners exhibit strong daily and weekly rhythms. Common patterns 
 Morning peaks on weekday commutes (7–9 AM, Monday–Friday)
 Evening wind-down listening (9–11 PM, particularly on weekdays)
 Extended weekend sessions on Saturday and Sunday afternoons
-Monthly variation — certain months show compressed, high-intensity listening while others are diffuse
+Monthly variation : certain months show compressed, high-intensity listening while others are diffuse
 
-These patterns can directly inform when to push recommendations — a curated "Monday morning" playlist is more contextually relevant than a generic weekly digest.
+These patterns can directly inform when to push recommendations: a curated "Monday morning" playlist is more contextually relevant than a generic weekly digest.
 
 4. Audio Feature Radar Chart
-The seven Spotify audio features are averaged across all tracks in df_audio and plotted on a polar radar chart. The resulting polygon is the listener's acoustic fingerprint — a signature of what they tend to listen to at a feature level.
+The seven Spotify audio features are averaged across all tracks in df_audio and plotted on a polar radar chart. The resulting polygon is the listener's acoustic fingerprint : a signature of what they tend to listen to at a feature level.
 Key insight: The shape of the radar reveals taste at a glance. A listener with high valence and energy gravitates toward upbeat, euphoric music. High acousticness and low energy points to a preference for quiet, intimate recordings. High speechiness suggests spoken-word content or rap. This fingerprint is used as a similarity target when ranking candidate tracks for recommendation.
 
 
