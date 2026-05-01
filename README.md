@@ -208,7 +208,7 @@ No new features were derived here. Instead, all 13 existing Spotify audio featur
 | `time_signature` | Estimated beats per bar |
 | `liked` | **Target variable**: 1 if the user liked the track, 0 if not |
 
-##  Visualizations 
+#  Visualizations 
 
 1. Genre Distribution (Bar Chart)
 A count plot of fav_music_genre ranked by frequency reveals which genres dominate listener preferences across the survey population. This distribution is used to weight genre recommendations; genres with higher representation are surfaced more confidently, while niche genres signal an opportunity for deeper catalog exploration.
