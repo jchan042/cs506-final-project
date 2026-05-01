@@ -234,7 +234,9 @@ The final model is evaluated on the test set of thirty songs using precision, re
 - **Euclidean distance assumptions:** After scaling, all nine features are treated as equally important. The model fails to understand that a user may prioritize tempo over danceability, for example.
 
 
-### Cosine Similarity 
+## Cosine Similarity 
+
+### Training Procedure
 
 This model implements a user-user collaborative filtering system built on top of Spotify listening history. It scores based on whether the user actually listened to it or skipped it, giving a clearer picture of what they genuinely like than raw play counts alone. Then, it uses cosine similarity to identify users with similar taste profiles and surface songs they loved that the target user hasn't heard yet.
 
