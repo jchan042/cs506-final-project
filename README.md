@@ -210,6 +210,26 @@ No new features were derived here. Instead, all 13 existing Spotify audio featur
 
 #  Models
 
+### Cosine Similarity 
+
+This model implements a user-user collaborative filtering system built on top of Spotify listening history. It scores based on whether the user actually listened to it or skipped it, giving a clearer picture of what they genuinely like than raw play counts alone. Then, it uses cosine similarity to identify users with similar taste profiles and surface songs they loved that the target user hasn't heard yet.
+
+1. Skip-Adjusted Interaction Weights
+Each (user, track) pair is assigned a weight based on listening behavior:
+
+weight = (complete_plays × 2 + non_skip_plays × 1 − skip_plays × 1.5) / total_plays
+
+Completed listens are rewarded, skips are penalized, and tracks with only one play are zeroed out. Tracks scoring above 0.5 are labeled as “liked”.
+
+2. User-Item Matrix
+Weights are pivoted into a [users × tracks] matrix where each row is one user's preference vector across all tracks.
+
+3. Cosine Similarity
+The model computes pairwise cosine similarity across all user vectors. Users with similar patterns of liked and skipped tracks end up with high similarity scores.
+
+4. Recommendation
+For a target user, the top ten most similar users are identified. Tracks they liked that the target hasn't heard are aggregated and ranked based on similarity-weighted score.
+
 #  Visualizations 
 
 1. Genre Distribution (Bar Chart)
