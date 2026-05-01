@@ -119,7 +119,7 @@ This dataset required minimal cleaning as it contained no nulls or duplicates. W
  
 ---
 
-## Feature Engineering
+# Feature Engineering
  
 Features were derived from the cleaned datasets to provide richer signals for modeling. The table below summarizes every engineered feature, the dataset it came from, and its purpose.
  
