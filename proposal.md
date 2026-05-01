@@ -39,13 +39,10 @@ We will implement and compare three different recommendation approaches to deter
 **Model 1: Content-Based Filtering (KNN)**  
 Using KNN, we will recommend songs similar to those the user has previously enjoyed based on audio features. These features include energy, danceability, tempo, loudness, key, mode, etc. 
 
-**Model 2: Content-Based Filtering (GMM)**  
-Using a Gaussian Mixture Model we will create clusters of users or clusters of songs, based on music preferences or audio features of the songs. By matching the distributions of user's preferences to the distribution of features in a song, we can match and recommend those songs to users and see if there are certain personas or specific clusters that allow for targeted recommendation.
-
-**Model 3: Hybrid Model (XGBoost)**  
+**Model 2: Hybrid Model (XGBoost)**  
 By using Gradient Boosting like XGBoost, we will capture both song characteristics and user behavior to recommend songs. Features include user behavior (skip rate, listening frequency, repeat plays), song metadata (popularity, release year), and contextual features (genre diversity in recent listens, mood trajectories). 
 
-**Model 4: Collaborative Filtering (User-User Similarity)**  
+**Model 3: Collaborative Filtering (User-User Similarity)**  
 We will recommend songs based on what similar users have enjoyed listening to through user-user similarity using cosine similarity. This will calculate similarity between users based on shared listening patterns by finding the top 10 most similar users and then recommend songs to the user that the similar users liked but the base user hasn't listened to. 
 
 ### Evaluation Strategy
