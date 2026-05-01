@@ -25,7 +25,7 @@ A detailed play-by-play log containing track name, artist, platform, timestamp, 
  
 ---
  
-### 3. Personal Streaming Activity 
+### 3. Streaming Activity 
  
 A real Spotify streaming history from a second user, exported directly from Spotify's "Download Your Data" feature. We included this dataset to enable user-user collaborative filtering, which requires at least two distinct listening profiles. Having this data and these features ensures the similarity modeling reflects authentic behavioral differences between real listeners.
  
@@ -64,7 +64,7 @@ gdown.download('https://drive.google.com/uc?id=1LgtifR5DqKPe0PTMbvUlJFU74Rv_uPx2
 
 After download, each file is loaded into a dedicated pandas DataFrame and immediately inspected for shape, column names, duplicate rows, and null counts before any cleaning is applied.
 
-## Data Cleaning
+# Data Cleaning
  
 In order to see the state of our data, we needed to perform an initial inspection. Below is a summary of what the data looked like initially for each of the 4 respective datasets:
 
@@ -89,4 +89,32 @@ Columns:  ['danceability', 'energy', 'key', 'loudness', 'mode', 'speechiness', '
 Duplicates:  0
 Nulls:  None
 ```
+---
+
+## Handling data
+
+As you can see, each dataset had their own unique problems and in the data cleaning process, we went through each dataset and dealt with missing/noisy/inconsistent data. 
+
+### 1. Spotify User Behavior Survey
+ 
+We removed 1 duplicate row to prevent skewed genre and mood distributions. Several column names contained misspellings such as ‘preffered’ and ‘Influencial’ which we standardized for consistency across all notebooks. String values of 'None' were replaced with actual null values so that pandas null-handling functions work correctly downstream. We also stripped whitespace from all string columns to prevent duplicate categories caused by spacing differences.
+ 
+---
+ 
+### 2. Spotify Streaming History 
+ 
+We removed 1,185 duplicate rows which would have inflated play counts and skewed skip rate calculations. The timestamp column was parsed from a string into a datetime object to enable time-based feature extraction. Milliseconds played was converted to seconds and minutes for interpretability. Rows where milliseconds played was 0 were removed as these represent buffering artifacts rather than real listens. We then flagged plays under 30 seconds as likely skipped, since the original skipped column only captures explicit forward-button skips and misses implicit skips where the user simply waited briefly before skipping. Null values in the reason start and reason end columns were filled with the value 'unknown' since a missing reason does not invalidate the play record. 
+ 
+---
+ 
+### 3. Streaming Activity 
+ 
+We dropped 3 redundant columns: a row index, a duplicate timezone timestamp, and a SongID column that was an unparseable concatenation of song name and artist with no separator. The UTC timestamp was parsed as a datetime and renamed to match the first streaming dataset's conventions. Rows with null album values were flagged as non-music content such as videos and gaming clips rather than dropped outright, since they still carry valid listening time information. We stripped whitespace from all string columns and renamed columns to match the first streaming dataset so that both can be combined. Both streaming datasets were then combined into a single dataframe with a user ID column added to distinguish which plays belong to which user, giving us a combined dataset of approximately 208,000 play records across two users.
+ 
+---
+ 
+### 4. Audio Features + Liked Label
+ 
+This dataset required minimal cleaning as it contained no nulls or duplicates. We converted duration from milliseconds to seconds for consistency with the other datasets. The most important processing step was applying MinMax normalization to all 13 audio features, scaling each to a range of 0 to 1. This is necessary because KNN is a distance-based algorithm: without normalization, high-range features like tempo (which sits between 60 and 200 BPM) would dominate the distance calculation over features that naturally sit between 0 and 1 like danceability, causing the model to weight tempo far more heavily than intended.
+ 
 ---
