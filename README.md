@@ -277,6 +277,41 @@ The model is evaluated using a holdout strategy where 20% of each user's liked t
 - **Sparsity:** most users have only heard a small fraction of all the songs in the dataset, making the user-item matrix sparse and candidate scores noisy
 - **Popularity bias:** tracks that appear across many users' histories naturally accumulate higher recommendation scores, regardless of how well they fit the target user specifically
 
+## XGBoost
+
+### Training Procedure
+
+The XGBoost model is trained on `spotify_history.csv`, a dataset of 145,139 plays across 16,342 unique tracks spanning 2013–2024. Rather than predicting song preference directly, the model predicts whether a given play will be skipped, where a play is labeled as skipped if Spotify's `skipped` flag is true or the play ended via the forward or back button (`reason_end ∈ {fwdbtn, backbtn}`). This framing keeps the label and features cleanly disjoint and avoids the target leakage that occurs when track-level engagement statistics like skip rate and completion rate are used both to define the label and as model inputs.
+
+Eleven context features describe the moment each play started — not properties of the track or outcomes of the play. These include cyclical encodings of hour, day-of-week, and month (so wrap-arounds like Sunday-to-Monday are preserved), `is_weekend`, `shuffle`, `minutes_since_last` (time elapsed since the previous play, capped at 24 hours), and the categorical fields `platform` and `reason_start`. Track-level aggregates and outcome-derived columns like `ms_played`, `seconds_played`, and `likely_skipped` are deliberately excluded because they bake the label into the features.
+
+The data is split temporally: plays before January 1, 2024 (135,282 rows) form the training set, and 2024 plays (9,857 rows) form the test set. A temporal split is the honest evaluation choice for time-series data, since a random split would leak future plays into training. Class imbalance is handled with `scale_pos_weight = neg/pos ≈ 1.58`, and categorical features use XGBoost's native handling via `enable_categorical=True` and `tree_method="hist"`. Hyperparameters: 300 trees, max_depth=5, learning_rate=0.05, subsample and colsample_bytree at 0.8.
+
+### Model Choice
+
+XGBoost suits this problem because the features are a mix of continuous (cyclical time encodings, minutes_since_last) and categorical (platform, reason_start), and gradient-boosted trees handle that mix natively without one-hot encoding. The model captures non-linear interactions — for example, the effect of `shuffle=True` on skip probability may differ between mobile and desktop platforms — which a linear model cannot. XGBoost is also robust to feature scaling and tolerant of missing values, which is useful when the data spans eleven years and column conventions may have shifted over time.
+
+### Evaluation Strategy
+
+The model is evaluated on the 2024 holdout set using precision, recall, F1, and ROC AUC, with F1 prioritized over accuracy because of the moderate class imbalance (22% skip rate in test). A confusion matrix shows the breakdown of true and false positives and negatives. To diagnose what the model is actually learning, three ablation variants were trained on identical data:
+
+| Variant | Features removed | F1 | AUC |
+|---|---|---|---|
+| Full | none | 0.846 | 0.955 |
+| No reason_start | `reason_start` | 0.861 | 0.948 |
+| Pure context | `reason_start`, `minutes_since_last` | 0.385 | 0.582 |
+
+The pure context variant — keeping only time, platform, and shuffle — collapses to near-random performance, revealing that the headline AUC is driven almost entirely by a single autoregressive feature (`minutes_since_last`). This is reported as the model's primary finding rather than buried: skip behavior is bursty (clustered in time) rather than habitual (tied to specific contexts).
+
+### Limitations & Failure Cases
+
+- **Single-feature dominance:** removing `minutes_since_last` collapses AUC from 0.95 to 0.58, meaning the model is functionally a session-momentum detector rather than a behavioral model
+- **Skip ≠ dislike:** skipping is a noisy proxy for preference, since users skip songs they love when in a hurry and let songs they dislike finish when distracted
+- **Concept drift:** train skip rate (39%) is much higher than test skip rate (22%), indicating substantial behavioral change between the training and evaluation periods
+- **Single-user data:** n=1 limits any claims about generalization; the model captures one person's patterns and cannot transfer to other users
+- **No track features:** without audio properties like genre, energy, or tempo, the model cannot explain why skips occur, only that they cluster in time
+- **Misleading feature importance:** `reason_start` scored 28% importance in the full model but its removal slightly improved F1, showing that XGBoost's importance metric counts split frequency rather than predictive contribution
+
 #  Visualizations 
 
 1. Genre Distribution (Bar Chart)
