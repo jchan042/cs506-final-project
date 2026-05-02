@@ -377,27 +377,21 @@ The pure context variant — keeping only time, platform, and shuffle — collap
 A count plot of fav_music_genre ranked by frequency reveals which genres dominate listener preferences across the survey population. This distribution is used to weight genre recommendations; genres with higher representation are surfaced more confidently, while niche genres signal an opportunity for deeper catalog exploration.
 Key insight: Listener preferences are rarely uniform. A long tail of minority genres typically appears, suggesting that a one-size-fits-all genre filter would exclude a meaningful portion of users.
 
-2. Stream Frequency Heatmap by Calendar Date
+2. Listening Habits Facet Grid (Hour × Day of Week, by Month)
 Streaming history is aggregated by year, month, and day of month, then rendered as a calendar heatmap (months on the Y-axis, days on the X-axis). Each cell's color intensity represents how many tracks were played on that date.
 Key insight: Listening volume is highly uneven across the year. Dense clusters of activity often correspond to periods of commuting, travel, or seasonal habits (e.g., summer months or holiday breaks). Sparse regions indicate low-engagement periods where recommendations may need to be more proactive or contextually prompted.
-
-3. Listening Habits Facet Grid (Hour × Day of Week, by Month)
-This is the most granular temporal visualization. Streaming history is broken into month-level heatmaps, each showing day of week (rows) vs. hour of day (columns), colored by stream count using the magma palette.
-Key insight: Listeners exhibit strong daily and weekly rhythms. Common patterns include:
-
+Patterns we noticed :
 Morning peaks on weekday commutes (7–9 AM, Monday–Friday)
 Evening wind-down listening (9–11 PM, particularly on weekdays)
 Extended weekend sessions on Saturday and Sunday afternoons
-Monthly variation : certain months show compressed, high-intensity listening while others are diffuse
 
-These patterns can directly inform when to push recommendations: a curated "Monday morning" playlist is more contextually relevant than a generic weekly digest.
 
-4. Audio Feature Radar Chart
+3. Audio Feature Radar Chart
 The seven Spotify audio features are averaged across all tracks in df_audio and plotted on a polar radar chart. The resulting polygon is the listener's acoustic fingerprint : a signature of what they tend to listen to at a feature level.
 Key insight: The shape of the radar reveals taste at a glance. A listener with high valence and energy gravitates toward upbeat, euphoric music. High acousticness and low energy points to a preference for quiet, intimate recordings. High speechiness suggests spoken-word content or rap. This fingerprint is used as a similarity target when ranking candidate tracks for recommendation.
 
+4. KNN Model – Feature ImportanceKNN Model – Feature Importance
+The KNN model's permutation feature importance plot reveals which audio features most meaningfully influence its ability to classify whether a user will skip a song. Speechiness stands out as by far the most important feature, producing the largest positive drop in F1 score when permuted, meaning the model relies on it heavily to make accurate predictions. Instrumentalness also contributes positively, though to a lesser degree. Interestingly, several features like tempo, energy, valence, acousticness, and loudness,show negative importance values, suggesting that permuting them actually slightly improves model performance, which may indicate that these features introduce noise rather than useful signal for KNN. Danceability and liveness appear to have virtually no impact on the model's predictions.
 
-5. Mood Map (Energy vs. Valence Scatter Plot)
-Tracks in df_audio are plotted as points on a two-dimensional mood space: valence (sad → happy) on the X-axis and energy (calm → intense) on the Y-axis. Points are colored by the liked field. Dashed reference lines at 0.5 on each axis divide the space into four quadrants:
-QuadrantCharacterHigh valence, high energyEuphoric / partyHigh valence, low energyPeaceful / contentLow valence, high energyAngry / tenseLow valence, low energyMelancholic / reflective
-Key insight: The distribution of liked vs. unliked tracks across quadrants reveals the listener's emotional comfort zone. If liked tracks cluster in the high-energy, high-valence quadrant, the recommender should prioritize tracks in that region. Tracks in quadrants with few or no liked points can be deprioritized or used for deliberate mood contrast.
+5. XGBoost Model – Confusion Matrix Performance
+The XGBoost model demonstrates strong overall performance in predicting song skipping behavior. Out of a total of 9,857 test samples, the model correctly classified 7,526 "no skip" instances and 1,708 "skip" instances, yielding a large number of true positives and true negatives. The false positive rate remains low, with only 141 songs incorrectly predicted as skips when they were not. The more notable source of error is the 482 false negatives, suggesting the model is slightly more conservative in predicting skips. Nevertheless, with correct predictions accounting for the vast majority of cases, the XGBoost model proves to be a reliable and well-performing classifier for this task.
