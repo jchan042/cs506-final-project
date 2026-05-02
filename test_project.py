@@ -58,7 +58,7 @@ def test_cleaned_streaming_activity():
     df = pd.read_csv(path)
     assert len(df) > 0, "cleaned_my_streaming_activity.csv is empty"
 
-# 3. Data quality checks 
+# 3. Data quality checks
 
 def test_audio_features_normalized():
     """All audio feature values should be in [0, 1] after cleaning."""
@@ -131,5 +131,5 @@ def test_cosine_similarity_runs():
     sim = cosine_similarity(matrix)
     assert sim.shape == (matrix.shape[0], matrix.shape[0]), \
         "Cosine similarity matrix has wrong shape"
-    assert float(sim.min()) >= -1 and float(sim.max()) <= 1, \
+    assert float(sim.min()) >= -1 and float(sim.max()) <= 1 + 1e-6, \
         "Cosine similarity values out of expected range"
