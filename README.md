@@ -1,4 +1,110 @@
 # Final Video : https://www.youtube.com/watch?v=NKRH1eM6CK4
+
+# How to Build and Run the Code
+
+## Prerequisites
+
+- Python 3.8 or higher
+- `pip` (comes with Python)
+- Git
+
+> **Note:** This project was originally developed in Google Colab. Any lines using `from google.colab import files` in the notebooks are **not needed when running locally** and should be commented out before running. All data files are already included in the `code/data/` directory, so no file uploading is necessary.
+
+---
+
+## Repository Structure
+
+```
+├── README.md
+├── requirements.txt
+├── Makefile
+└── code/
+    ├── data/
+    │   ├── cleaned_audio_features.csv
+    │   ├── cleaned_my_streaming_activity.csv
+    │   ├── cleaned_streaming_history.csv
+    │   └── cleaned_user_behavior.csv
+    ├── data_cleaning/
+    │   └── data_cleaning.ipynb
+    └── model/
+        ├── cosine_model.ipynb
+        └── knn_model.ipynb
+```
+
+---
+
+## Setup and Run (Recommended)
+
+Clone the repository and use the Makefile to install all dependencies and execute all notebooks:
+
+```bash
+git clone <your-repo-url>
+cd <your-repo-name>
+make
+```
+
+This runs two steps automatically:
+
+1. **`make install`** — installs all required Python packages via `pip`
+2. **`make run`** — executes all notebooks in order using `nbconvert`:
+   - `data_cleaning.ipynb` (data preprocessing)
+   - `cosine_model.ipynb` (cosine similarity model)
+   - `knn_model.ipynb` (KNN model)
+
+---
+
+## Running Steps Individually
+
+If you want to run each step separately:
+
+```bash
+# Step 1: Install dependencies
+make install
+
+# Step 2: Run all notebooks
+make run
+```
+
+---
+
+## Viewing Notebooks Interactively (Optional)
+
+If you prefer to explore the notebooks in a browser instead of running them via the Makefile:
+
+```bash
+make install
+jupyter notebook
+```
+
+Then navigate to the notebook you want to open in the Jupyter interface.
+
+---
+
+## Cleaning Up
+
+To remove Jupyter checkpoint files:
+
+```bash
+make clean
+```
+
+---
+
+## Dependencies
+
+All dependencies are listed in `requirements.txt` and installed automatically via `make install`:
+
+| Package | Purpose |
+|---|---|
+| `pandas` | Data manipulation |
+| `numpy` | Numerical computation |
+| `scikit-learn` | KNN and cosine similarity models |
+| `matplotlib` | Plotting |
+| `seaborn` | Statistical visualizations |
+| `gdown` | Downloading files from Google Drive |
+| `jupyter` | Running notebooks interactively |
+| `nbconvert` | Executing notebooks non-interactively |
+
 # Data Collection
 
 ## Data Sources
