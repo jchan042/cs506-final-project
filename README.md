@@ -12,8 +12,8 @@
 
 **Step 1: Clone the repo**
 ```bash
-git clone <your-repo-url>
-cd <your-repo-name>
+git clone https://github.com/jchan042/cs506-final-project
+cd cs506-final-project
 ```
 
 **Step 2: Install dependencies**
