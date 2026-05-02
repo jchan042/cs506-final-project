@@ -8,7 +8,8 @@ install:
 run:
 	jupyter nbconvert --to notebook --execute --inplace code/data_cleaning/data_cleaning.ipynb
 	jupyter nbconvert --to notebook --execute --inplace code/model/cosine_model.ipynb
-	jupyter nbconvert --to notebook --execute --inplace code/model/knn_model.ipynb
+	jupyter nbconvert --to notebook --execute --inplace code/model/knn.ipynb
+	jupyter nbconvert --to notebook --execute --inplace code/model/xgboost.ipynb
 
 clean:
 	find . -name "*.ipynb_checkpoints" -exec rm -rf {} + 2>/dev/null || true
