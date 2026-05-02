@@ -6,3 +6,4 @@ seaborn
 gdown
 jupyter
 nbconvert
+openpyxl
