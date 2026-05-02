@@ -271,6 +271,8 @@ The model is evaluated using a holdout strategy where 20% of each user's liked t
 | Recall | How many of the hidden songs appeared in the recommendations |
 | F1 | The average of precision and recall combined into one score |
 
+Running the model on simulated users yielded a precision of 0.47, meaning that nearly half of the recommendations were songs the user liked. Recall was low at 0.027, which is expected given the dataset's 94.6% sparsity, since there were over 16,000 tracks in the catalog. The F1 score of 0.050 reflects this tradeoff between strong precision and limited recall.
+
 ### Limitations & Failure Cases
 - **Cold start:** users with very few plays lack enough signal to build a meaningful preference vector or holdout set
 - **Synthetic users:** the 25 users are partitioned from a single person's history, which inflates similarity scores and reduces the diversity of taste the model is exposed to
