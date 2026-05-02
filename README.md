@@ -31,6 +31,15 @@ make run
 make clean
 ```
 
+## Running Tests
+ 
+```bash
+pip install pytest
+pytest test_project.py -v
+```
+ 
+Tests verify that data files exist, cleaned datasets have the correct structure, and models produce valid outputs. All 11 tests should pass.
+
 ## Dependencies
 
 All dependencies are listed in `requirements.txt` and installed automatically via `make install`:
